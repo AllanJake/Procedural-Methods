@@ -11,6 +11,7 @@
 #include <d3d11.h>
 #include <d3dx10math.h>
 #include <stdio.h>
+#include "PerlinNoise.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +63,7 @@ private:
 	
 private:
 	bool m_terrainGeneratedToggle;
+	bool m_terrainSmoothToggle;
 	int m_terrainWidth, m_terrainHeight;
 	int m_vertexCount, m_indexCount;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

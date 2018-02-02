@@ -11,6 +11,7 @@ TerrainClass::TerrainClass()
 	m_indexBuffer = 0;
 	m_heightMap = 0;
 	m_terrainGeneratedToggle = false;
+	m_terrainSmoothToggle = false;
 }
 
 
@@ -141,7 +142,7 @@ bool TerrainClass::GenerateHeightMap(ID3D11Device* device, bool keydown)
 	{
 		int index;
 		float height = 0.0;
-		
+		double test = new PerlinNoise(264);
 
 		//loop through the terrain and set the hieghts how we want. This is where we generate the terrain
 		//in this case I will run a sin-wave through the terrain in one axis.
@@ -154,7 +155,7 @@ bool TerrainClass::GenerateHeightMap(ID3D11Device* device, bool keydown)
 
 				m_heightMap[index].x = (float)i;
 				//m_heightMap[index].y = (float)(sin((float)i / (m_terrainWidth / 12))*8.0) + (cos((float)j / (m_terrainWidth / 15)) * 5.0f); //magic numbers ahoy, just to ramp up the height of the sin function so its visible.
-				m_heightMap[index].y = rand() % 10;
+				m_heightMap[index].y = 
 				m_heightMap[index].z = (float)j;
 			}
 		}
@@ -174,7 +175,7 @@ bool TerrainClass::GenerateHeightMap(ID3D11Device* device, bool keydown)
 
 		m_terrainGeneratedToggle = true;
 	}
-	else
+	else if (!keydown && (m_terrainGeneratedToggle))
 	{
 		m_terrainGeneratedToggle = false;
 	}
@@ -188,83 +189,84 @@ bool TerrainClass::smoothTerrain(ID3D11Device* device, bool keydown)
 	//the toggle is just a bool that I use to make sure this is only called ONCE when you press a key
 	//until you release the key and start again. We dont want to be generating the terrain 500
 	//times per second. 
-	if (keydown && (!m_terrainGeneratedToggle))
+	if (keydown && (!m_terrainSmoothToggle))
 	{
 		int index;
-		float average = 0.0f;
+		float average;
 		float height = 0.0;
 
 
 		//loop through the terrain and set the hieghts how we want. This is where we generate the terrain
 		//in this case I will run a sin-wave through the terrain in one axis.
 
-		for (int j = 0; j<m_terrainHeight; j++)
+		for (int j = 0; j < m_terrainHeight; j++)
 		{
-			for (int i = 0; i<m_terrainWidth; i++)
-			{		
-				
+			for (int i = 0; i < m_terrainWidth; i++)
+			{
+				average = 0.0f;
 				//// Grab the average of the surrounding points
 				// (-1, -1)
 				index = (m_terrainHeight * (j - 1) + (i - 1));
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth)&& (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
+
 				// (0, -1)
 				index = (m_terrainHeight * (j - 1) + i);
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth) && (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
 				// (1, -1)
 				index = (m_terrainHeight * (j - 1) + (i + 1));
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth) && (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
 				// (-1, 0)
 				index = (m_terrainHeight * j + (i - 1));
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth) && (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
 				// (0, 0)
 				index = (m_terrainHeight * j) + i;
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth) && (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
 				// (1, 0)
 				index = (m_terrainHeight * j + (i + 1));
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth) && (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
 				// (-1, 1)
 				index = (m_terrainHeight * (j + 1) + (i - 1));
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth) && (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
 				// (0, 1)
 				index = (m_terrainHeight * (j + 1) + i);
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth) && (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
 				// (1, 1)
 				index = (m_terrainHeight * (j + 1) + (i + 1));
-				if (index < m_terrainHeight * m_terrainWidth)
+				if ((index < m_terrainHeight * m_terrainWidth) && (index > 0))
 				{
 					average += m_heightMap[index].y;
 				}
 
+				average = average / 9;
 
 				index = (m_terrainHeight * j) + i;
-				height = average / 9;
 
 				m_heightMap[index].x = (float)i;
-				m_heightMap[index].y = height;
+				m_heightMap[index].y = average;
 				m_heightMap[index].z = (float)j;
 			}
 		}
@@ -282,11 +284,12 @@ bool TerrainClass::smoothTerrain(ID3D11Device* device, bool keydown)
 			return false;
 		}
 
-		m_terrainGeneratedToggle = true;
+		m_terrainSmoothToggle = true;
 	}
+
 	else
 	{
-		m_terrainGeneratedToggle = false;
+		m_terrainSmoothToggle = false;
 	}
 
 	return true;
