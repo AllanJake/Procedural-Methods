@@ -142,7 +142,8 @@ bool TerrainClass::GenerateHeightMap(ID3D11Device* device, bool keydown)
 	{
 		int index;
 		float height = 0.0;
-		double test = new PerlinNoise(264);
+		PerlinNoise Pn(58);
+		
 
 		//loop through the terrain and set the hieghts how we want. This is where we generate the terrain
 		//in this case I will run a sin-wave through the terrain in one axis.
@@ -155,7 +156,8 @@ bool TerrainClass::GenerateHeightMap(ID3D11Device* device, bool keydown)
 
 				m_heightMap[index].x = (float)i;
 				//m_heightMap[index].y = (float)(sin((float)i / (m_terrainWidth / 12))*8.0) + (cos((float)j / (m_terrainWidth / 15)) * 5.0f); //magic numbers ahoy, just to ramp up the height of the sin function so its visible.
-				m_heightMap[index].y = 
+				//m_heightMap[index].y = rand() % 9;
+				m_heightMap[index].y = Pn.noise(i, j, 1.5);
 				m_heightMap[index].z = (float)j;
 			}
 		}

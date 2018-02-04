@@ -5,6 +5,7 @@
 #include <numeric>
 #include <random>
 #include <algorithm>
+#include <math.h>
 
 class PerlinNoise
 {
