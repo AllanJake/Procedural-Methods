@@ -157,7 +157,7 @@ bool TerrainClass::GenerateHeightMap(ID3D11Device* device, bool keydown)
 				m_heightMap[index].x = (float)i;
 				//m_heightMap[index].y = (float)(sin((float)i / (m_terrainWidth / 12))*8.0) + (cos((float)j / (m_terrainWidth / 15)) * 5.0f); //magic numbers ahoy, just to ramp up the height of the sin function so its visible.
 				//m_heightMap[index].y = rand() % 9;
-				m_heightMap[index].y = Pn.noise(i, j, 1.5);
+				m_heightMap[index].y = (Pn.noise(i, j, 1.5)) * 5;
 				m_heightMap[index].z = (float)j;
 			}
 		}
